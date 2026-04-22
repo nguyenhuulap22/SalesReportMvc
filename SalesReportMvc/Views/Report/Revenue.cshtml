@@ -1,0 +1,21 @@
+﻿@model List<SalesReportMvc.Models.ReportDtos.RevenueReportDto>
+
+<h2>Doanh thu theo ngày</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Ngày</th>
+            <th>Doanh thu</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.SaleDate.ToString("dd/MM/yyyy")</td>
+                <td>@item.Revenue.ToString("N0")</td>
+            </tr>
+        }
+    </tbody>
+</table>
