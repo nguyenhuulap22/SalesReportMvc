@@ -1,0 +1,37 @@
+/* Revenue Report Styles */
+.revenue-container {
+	padding: 0;
+}
+
+.revenue-summary-card {
+	transition: transform 0.2s;
+}
+
+	.revenue-summary-card:hover {
+		transform: translateY(-5px);
+	}
+
+.revenue-chart-container {
+	position: relative;
+	min-height: 400px;
+}
+
+.revenue-table tbody tr {
+	transition: background-color 0.2s;
+}
+
+	.revenue-table tbody tr:hover {
+		background-color: rgba(59, 130, 246, 0.05);
+	}
+
+.revenue-percentage-bar {
+	background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+	border-radius: 10px;
+	transition: width 0.5s ease;
+}
+
+@media (max-width: 768px) {
+	.revenue-chart-container {
+		min-height: 250px;
+	}
+}

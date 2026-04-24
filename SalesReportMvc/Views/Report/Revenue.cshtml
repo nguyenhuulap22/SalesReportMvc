@@ -1,21 +1,288 @@
 ﻿@model List<SalesReportMvc.Models.ReportDtos.RevenueReportDto>
 
-<h2>Doanh thu theo ngày</h2>
+@{
+    ViewData["Title"] = "Báo cáo doanh thu";
+    var pagination = ViewBag.Pagination as PaginationModel ?? new PaginationModel();
+    var totalRevenue = ViewBag.TotalRevenue ?? Model.Sum(x => x.Revenue);
+    var avgRevenue = ViewBag.AvgRevenue ?? (Model.Any() ? Model.Average(x => x.Revenue) : 0);
+    var maxRevenue = ViewBag.MaxRevenue ?? (Model.Any() ? Model.Max(x => x.Revenue) : 0);
+    var minRevenue = ViewBag.MinRevenue ?? (Model.Any() ? Model.Min(x => x.Revenue) : 0);
+    var revenueDates = ViewBag.ChartDates ?? Model.Select(x => x.SaleDate.ToString("dd/MM")).ToList();
+    var revenueValues = ViewBag.ChartValues ?? Model.Select(x => x.Revenue).ToList();
+    var fromDate = ViewBag.FromDateFilter as DateTime?;
+    var toDate = ViewBag.ToDateFilter as DateTime?;
+}
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Ngày</th>
-            <th>Doanh thu</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
+<link rel="stylesheet" href="~/css/revenue.css" />
+
+<div class="revenue-container">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div>
+            <h2 class="text-gray-800 mb-0">
+                <i class="fas fa-chart-line text-primary me-2"></i> Báo cáo doanh thu
+            </h2>
+            <p class="text-muted mt-2">Thống kê doanh thu theo ngày</p>
+        </div>
+        <div class="d-flex gap-2 mt-3 mt-md-0">
+            <button onclick="window.print()" class="btn btn-secondary">
+                <i class="fas fa-print me-1"></i> In báo cáo
+            </button>
+            <button id="exportExcelBtn" class="btn btn-success">
+                <i class="fas fa-file-excel me-1"></i> Xuất Excel
+            </button>
+            <a href="/report/revenue/export-pdf" class="btn btn-danger">
+                <i class="fas fa-file-pdf me-1"></i> Xuất PDF
+            </a>
+            <a href="/report" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Quay lại
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="card shadow-sm revenue-filter-bar mb-4">
+        <div class="card-body">
+            <form method="get" id="filterForm">
+                <div class="row g-3 align-items-end">
+                    <input type="hidden" name="page" id="pageInput" value="@pagination.CurrentPage" />
+                    <input type="hidden" name="pageSize" id="pageSizeInput" value="@pagination.PageSize" />
+                    
+                    <div class="col-12 col-md-4">
+                        <label class="form-label fw-bold small">
+                            <i class="fas fa-calendar-alt me-1"></i> Từ ngày
+                        </label>
+                        <input type="date" name="fromDate" id="fromDate" class="form-control" 
+                               value="@(fromDate?.ToString("yyyy-MM-dd") ?? "")">
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label class="form-label fw-bold small">
+                            <i class="fas fa-calendar-alt me-1"></i> Đến ngày
+                        </label>
+                        <input type="date" name="toDate" id="toDate" class="form-control" 
+                               value="@(toDate?.ToString("yyyy-MM-dd") ?? "")">
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label class="form-label fw-bold small">&nbsp;</label>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-filter me-1"></i> Lọc dữ liệu
+                            </button>
+                            <button type="button" id="resetFilter" class="btn btn-outline-secondary">
+                                <i class="fas fa-undo-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-end align-items-center">
+                            <div class="page-size-selector">
+                                <label class="small text-muted me-2">Hiển thị:</label>
+                                <select name="pageSize" id="pageSizeSelect" class="form-select form-select-sm w-auto">
+                                    <option value="5" selected="@(pagination.PageSize == 5)">5</option>
+                                    <option value="10" selected="@(pagination.PageSize == 10)">10</option>
+                                    <option value="20" selected="@(pagination.PageSize == 20)">20</option>
+                                    <option value="50" selected="@(pagination.PageSize == 50)">50</option>
+                                </select>
+                                <span class="small text-muted ms-2">bản ghi/trang</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <!-- Summary Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="card bg-primary text-white shadow-sm revenue-summary-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="opacity-75">Tổng doanh thu</small>
+                                <h4 class="mb-0">@totalRevenue.ToString("N0")đ</h4>
+                            </div>
+                            <i class="fas fa-chart-line fa-2x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card bg-success text-white shadow-sm revenue-summary-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="opacity-75">Trung bình/ngày</small>
+                                <h4 class="mb-0">@avgRevenue.ToString("N0")đ</h4>
+                            </div>
+                            <i class="fas fa-calculator fa-2x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card bg-info text-white shadow-sm revenue-summary-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="opacity-75">Cao nhất</small>
+                                <h4 class="mb-0">@maxRevenue.ToString("N0")đ</h4>
+                            </div>
+                            <i class="fas fa-arrow-up fa-2x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card bg-warning text-dark shadow-sm revenue-summary-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="opacity-75">Thấp nhất</small>
+                                <h4 class="mb-0">@minRevenue.ToString("N0")đ</h4>
+                            </div>
+                            <i class="fas fa-arrow-down fa-2x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-simple me-2 text-primary"></i> Biểu đồ doanh thu theo ngày
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="revenue-chart-container">
+                    <canvas id="revenueChart" style="max-height: 400px; width: 100%;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Revenue Table -->
+        <div class="card shadow-sm revenue-table-container">
+            <div class="card-header bg-white py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-table me-2 text-primary"></i> Chi tiết doanh thu theo ngày
+                        <span class="badge revenue-badge revenue-badge-secondary ms-2">@pagination.TotalRecords ngày</span>
+                    </h5>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="revenueTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="text-center" width="50">STT</th>
+                                <th>Ngày</th>
+                                <th class="text-end">Doanh thu (VNĐ)</th>
+                                <th class="text-end">Tỷ lệ</th>
+                                <th class="text-center" width="150">Biểu đồ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int stt = (pagination.CurrentPage - 1) * pagination.PageSize + 1;
+                                foreach (var item in Model)
+                                {
+                                    var percentage = totalRevenue > 0 ? (item.Revenue / totalRevenue * 100) : 0;
+                                    <tr>
+                                        <td class="text-center text-muted">@stt</td>
+                                        <td class="fw-bold">
+                                            <i class="fas fa-calendar-day me-2 text-primary"></i>
+                                            @item.SaleDate.ToString("dddd, dd/MM/yyyy")
+                                        </td>
+                                        <td class="text-end fw-bold text-primary">
+                                            @item.Revenue.ToString("N0")đ
+                                        </td>
+                                        <td class="text-end">
+                                            <span class="badge revenue-badge revenue-badge-secondary">@percentage.ToString("F1")%</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="revenue-progress">
+                                                <div class="revenue-progress-bar" 
+                                                     style="width: @percentage%">
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    stt++;
+                                }
+                            }
+                        </tbody>
+                        <tfoot class="table-light fw-bold">
+                            <tr>
+                                <td colspan="2" class="text-end">Tổng cộng:</td>
+                                <td class="text-end text-primary fs-5">@totalRevenue.ToString("N0")đ</td>
+                                <td colspan="2"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        @if (pagination.TotalPages > 1)
         {
-            <tr>
-                <td>@item.SaleDate.ToString("dd/MM/yyyy")</td>
-                <td>@item.Revenue.ToString("N0")</td>
-            </tr>
+            <div class="mt-4">
+                @await Html.PartialAsync("_Pagination", pagination)
+            </div>
         }
-    </tbody>
-</table>
+    }
+    else
+    {
+        <!-- No Data -->
+        <div class="revenue-no-data">
+            <div class="revenue-no-data-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <h4>Không có dữ liệu doanh thu</h4>
+            <p class="text-muted">
+                @if (fromDate.HasValue || toDate.HasValue)
+                {
+                    <span>Không tìm thấy dữ liệu trong khoảng thời gian đã chọn.<br></span>
+                }
+                Hiện tại chưa có đơn hàng nào được thanh toán.<br>
+                Vui lòng kiểm tra lại đơn hàng trong database.
+            </p>
+            <div class="mt-3">
+                <a href="/report/test-db" class="btn btn-warning me-2">
+                    <i class="fas fa-database me-1"></i> Kiểm tra Database
+                </a>
+                <button id="clearFilters" class="btn btn-info me-2">
+                    <i class="fas fa-trash-alt me-1"></i> Xóa bộ lọc
+                </button>
+                <a href="/report" class="btn btn-primary">
+                    <i class="fas fa-arrow-left me-1"></i> Quay lại
+                </a>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/js/revenue.js"></script>
+    
+    <script>
+        // Truyền dữ liệu biểu đồ từ server sang JavaScript
+        var revenueChartData = {
+            dates: @Html.Raw(Json.Serialize(revenueDates)),
+            values: @Html.Raw(Json.Serialize(revenueValues))
+        };
+        
+        // Khởi tạo trang khi load
+        $(document).ready(function() {
+            initRevenuePage();
+        });
+    </script>
+}

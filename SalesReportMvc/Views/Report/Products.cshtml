@@ -1,29 +1,331 @@
 ﻿@model List<SalesReportMvc.Models.ReportDtos.ProductReportDto>
 
-<h2>Danh sách sản phẩm</h2>
+@{
+    ViewData["Title"] = "Báo cáo sản phẩm";
+    var totalInventoryValue = Model.Sum(x => x.UnitPrice * x.StockQuantity);
+    var lowStockCount = Model.Count(x => x.StockQuantity < 10);
+    var pagination = ViewBag.Pagination as PaginationModel ?? new PaginationModel();
+}
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Mã SP</th>
-            <th>Tên SP</th>
-            <th>Loại</th>
-            <th>Đơn giá</th>
-            <th>Tồn kho</th>
-            <th>Đơn vị</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.ProductId</td>
-                <td>@item.ProductName</td>
-                <td>@item.CategoryName</td>
-                <td>@item.UnitPrice.ToString("N0")</td>
-                <td>@item.StockQuantity</td>
-                <td>@item.Unit</td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div class="container-fluid px-2 px-md-4">
+    <!-- Header Section -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h2 class="text-gray-800 mb-0 fs-3">
+                <i class="fas fa-boxes text-primary me-2"></i> Báo cáo sản phẩm
+            </h2>
+            <p class="text-muted mt-2 mb-0">Danh sách sản phẩm theo danh mục</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <button onclick="window.print()" class="btn btn-secondary">
+                <i class="fas fa-print me-1"></i> In báo cáo
+            </button>
+            <button id="exportExcelBtn" class="btn btn-success">
+                <i class="fas fa-file-excel me-1"></i> Xuất Excel
+            </button>
+            <a href="/report/products/export-pdf?search=@ViewBag.Search&category=@ViewBag.Category&stock=@ViewBag.Stock" class="btn btn-danger">
+                <i class="fas fa-file-pdf me-1"></i> Xuất PDF
+            </a>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="card bg-primary text-white shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0 opacity-75">
+                                <i class="fas fa-cubes me-1"></i> Tổng sản phẩm
+                            </h6>
+                            <h2 class="mb-0">@pagination.TotalRecords</h2>
+                        </div>
+                        <i class="fas fa-boxes fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="card bg-success text-white shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0 opacity-75">
+                                <i class="fas fa-tags me-1"></i> Danh mục
+                            </h6>
+                            <h2 class="mb-0">@ViewBag.TotalCategories</h2>
+                        </div>
+                        <i class="fas fa-folder-open fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="card bg-info text-white shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0 opacity-75">
+                                <i class="fas fa-chart-line me-1"></i> Giá trị tồn kho
+                            </h6>
+                            <h5 class="mb-0">@totalInventoryValue.ToString("N0")đ</h5>
+                        </div>
+                        <i class="fas fa-coins fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="card bg-warning text-dark shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0 opacity-75">
+                                <i class="fas fa-exclamation-triangle me-1"></i> Sắp hết hàng
+                            </h6>
+                            <h2 class="mb-0">@lowStockCount</h2>
+                        </div>
+                        <i class="fas fa-clock fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Bar - Submit về server -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" id="filterForm" action="/report/products">
+                <div class="row g-3 align-items-end">
+                    <div class="col-12 col-md-4">
+                        <label class="form-label fw-bold small">
+                            <i class="fas fa-search me-1"></i> Tìm kiếm
+                        </label>
+                        <input type="text" name="search" id="searchInput" class="form-control" 
+                               placeholder="Nhập tên sản phẩm..." value="@ViewBag.Search">
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label class="form-label fw-bold small">
+                            <i class="fas fa-filter me-1"></i> Danh mục
+                        </label>
+                        <select name="category" id="categoryFilter" class="form-select">
+                            <option value="">-- Tất cả danh mục --</option>
+                            @foreach (var cat in ViewBag.AllCategories as List<string> ?? new List<string>())
+                            {
+                                if (ViewBag.Category == cat)
+                                {
+                                    <option value="@cat" selected>@cat</option>
+                                }
+                                else
+                                {
+                                    <option value="@cat">@cat</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label class="form-label fw-bold small">
+                            <i class="fas fa-chart-simple me-1"></i> Tình trạng tồn kho
+                        </label>
+                        <div class="d-flex gap-2">
+                            <select name="stock" id="stockFilter" class="form-select">
+                                <option value="">-- Tất cả --</option>
+                                <option value="low" selected="@(ViewBag.Stock == "low")">
+                                    <i class="fas fa-exclamation-triangle"></i> Còn ít (&lt; 10)
+                                </option>
+                                <option value="medium" selected="@(ViewBag.Stock == "medium")">
+                                    <i class="fas fa-chart-line"></i> Trung bình (10-50)
+                                </option>
+                                <option value="high" selected="@(ViewBag.Stock == "high")">
+                                    <i class="fas fa-check-circle"></i> Nhiều (&gt; 50)
+                                </option>
+                            </select>
+                            <button type="button" id="resetFilter" class="btn btn-outline-secondary">
+                                <i class="fas fa-undo-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="page-size-selector">
+                                <label class="small text-muted me-2">
+                                    <i class="fas fa-eye me-1"></i> Hiển thị:
+                                </label>
+                                <select name="pageSize" id="pageSizeSelect" class="form-select form-select-sm w-auto">
+                                    <option value="5" selected="@(pagination.PageSize == 5)">5</option>
+                                    <option value="10" selected="@(pagination.PageSize == 10)">10</option>
+                                    <option value="20" selected="@(pagination.PageSize == 20)">20</option>
+                                    <option value="50" selected="@(pagination.PageSize == 50)">50</option>
+                                </select>
+                                <span class="small text-muted ms-2">bản ghi/trang</span>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <i class="fas fa-filter me-1"></i> Áp dụng bộ lọc
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Products Table -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold">
+                    <i class="fas fa-list me-2 text-primary"></i> Danh sách sản phẩm
+                    <span class="badge bg-secondary ms-2">@pagination.TotalRecords sản phẩm</span>
+                </h5>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="productsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="text-center" width="60">
+                                <i class="fas fa-hashtag"></i> Mã
+                            </th>
+                            <th>
+                                <i class="fas fa-box"></i> Tên sản phẩm
+                            </th>
+                            <th width="150">
+                                <i class="fas fa-folder"></i> Danh mục
+                            </th>
+                            <th class="text-end" width="120">
+                                <i class="fas fa-dollar-sign"></i> Đơn giá
+                            </th>
+                            <th class="text-center" width="100">
+                                <i class="fas fa-warehouse"></i> Tồn kho
+                            </th>
+                            <th class="text-center" width="80">
+                                <i class="fas fa-ruler"></i> Đơn vị
+                            </th>
+                            <th class="text-end" width="150">
+                                <i class="fas fa-chart-line"></i> Giá trị tồn
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                var stockClass = item.StockQuantity < 10 ? "danger" : (item.StockQuantity < 50 ? "warning" : "success");
+                                var stockIcon = item.StockQuantity < 10 ? "fa-exclamation-triangle" : (item.StockQuantity < 50 ? "fa-clock" : "fa-check-circle");
+                                <tr>
+                                    <td class="text-center text-muted">@item.ProductId</td>
+                                    <td class="fw-bold">
+                                        <i class="fas fa-cube text-primary me-1"></i> @item.ProductName
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary bg-opacity-10 text-dark">
+                                            <i class="fas fa-folder me-1"></i> @item.CategoryName
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="fw-bold text-primary">@item.UnitPrice.ToString("N0")đ</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-@stockClass bg-opacity-10 text-@stockClass">
+                                            <i class="fas @stockIcon me-1"></i> @item.StockQuantity
+                                        </span>
+                                    </td>
+                                    <td class="text-center text-muted">
+                                        <i class="fas fa-ruler me-1"></i> @item.Unit
+                                    </td>
+                                    <td class="text-end fw-semibold">
+                                        @((item.UnitPrice * item.StockQuantity).ToString("N0"))đ
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center py-4 text-muted">
+                                    <i class="fas fa-inbox fa-3x mb-2 d-block"></i>
+                                    Không có dữ liệu sản phẩm
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot class="table-light fw-bold">
+                        <tr>
+                            <td colspan="6" class="text-end">
+                                <i class="fas fa-calculator me-1"></i> Tổng giá trị tồn kho:
+                            </td>
+                            <td class="text-end text-primary">
+                                <i class="fas fa-chart-line me-1"></i> @totalInventoryValue.ToString("N0")đ
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    @if (pagination.TotalPages > 1)
+    {
+        <div class="mt-4">
+            @await Html.PartialAsync("_Pagination", pagination)
+        </div>
+    }
+
+    <!-- Footer -->
+    <div class="mt-4 d-flex justify-content-between align-items-center">
+        <a href="/report" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Quay lại
+        </a>
+        <small class="text-muted">
+            <i class="fas fa-calendar-alt me-1"></i> Cập nhật: @DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")
+        </small>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Reset filters - Chuyển hướng về trang products không có filter
+            $('#resetFilter').on('click', function() {
+                window.location.href = '/report/products';
+            });
+            
+            // Submit form when page size changes
+            $('#pageSizeSelect').on('change', function() {
+                // Lấy giá trị hiện tại của các filter
+                var search = $('#searchInput').val();
+                var category = $('#categoryFilter').val();
+                var stock = $('#stockFilter').val();
+                var pageSize = $(this).val();
+                
+                // Xây dựng URL
+                var url = '/report/products?page=1&pageSize=' + pageSize;
+                if (search) url += '&search=' + encodeURIComponent(search);
+                if (category) url += '&category=' + encodeURIComponent(category);
+                if (stock) url += '&stock=' + encodeURIComponent(stock);
+                
+                window.location.href = url;
+            });
+            
+            // Export Excel
+            $('#exportExcelBtn').on('click', function() {
+                var search = $('#searchInput').val();
+                var category = $('#categoryFilter').val();
+                var stock = $('#stockFilter').val();
+                
+                var url = '/report/products/export-excel?';
+                if (search) url += 'search=' + encodeURIComponent(search) + '&';
+                if (category) url += 'category=' + encodeURIComponent(category) + '&';
+                if (stock) url += 'stock=' + encodeURIComponent(stock);
+                
+                window.location.href = url;
+            });
+        });
+    </script>
+}

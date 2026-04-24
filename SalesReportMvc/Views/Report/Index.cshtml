@@ -1,0 +1,483 @@
+@{
+    ViewData["Title"] = "Trang chủ báo cáo";
+}
+
+<div class="index-container">
+    <!-- Hero Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="bg-gradient-primary text-white rounded-4 p-4 p-md-5 shadow-lg hero-section">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                    <div>
+                        <h1 class="display-5 fw-bold mb-2">
+                            <i class="fas fa-chart-pie me-3"></i> Hệ thống báo cáo
+                        </h1>
+                        <p class="lead mb-0 opacity-90">
+                            Quản lý và thống kê dữ liệu bán hàng chuyên nghiệp
+                        </p>
+                        <p class="mt-2">
+                            <i class="fas fa-calendar-alt me-1"></i> Hôm nay: @DateTime.Now.ToString("dddd, dd/MM/yyyy")
+                        </p>
+                    </div>
+                    <div class="mt-3 mt-md-0">
+                        <div class="bg-white bg-opacity-25 rounded-3 p-3 text-center">
+                            <i class="fas fa-chart-line fa-3x"></i>
+                            <p class="mb-0 small mt-2">Tổng quan dữ liệu</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100 stat-card">
+                <div class="card-body text-center">
+                    <div class="rounded-circle bg-primary bg-opacity-10 p-3 d-inline-block mb-3">
+                        <i class="fas fa-boxes fa-2x text-primary"></i>
+                    </div>
+                    <h5 class="card-title mb-0">Sản phẩm</h5>
+                    <p class="card-text fs-4 fw-bold text-primary mb-0" id="totalProducts">-</p>
+                    <small class="text-muted">Đang kinh doanh</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100 stat-card">
+                <div class="card-body text-center">
+                    <div class="rounded-circle bg-success bg-opacity-10 p-3 d-inline-block mb-3">
+                        <i class="fas fa-tags fa-2x text-success"></i>
+                    </div>
+                    <h5 class="card-title mb-0">Danh mục</h5>
+                    <p class="card-text fs-4 fw-bold text-success mb-0" id="totalCategories">-</p>
+                    <small class="text-muted">Sản phẩm</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100 stat-card">
+                <div class="card-body text-center">
+                    <div class="rounded-circle bg-info bg-opacity-10 p-3 d-inline-block mb-3">
+                        <i class="fas fa-file-invoice-dollar fa-2x text-info"></i>
+                    </div>
+                    <h5 class="card-title mb-0">Doanh thu</h5>
+                    <p class="card-text fs-4 fw-bold text-info mb-0" id="totalRevenue">-</p>
+                    <small class="text-muted">Tháng này</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100 stat-card">
+                <div class="card-body text-center">
+                    <div class="rounded-circle bg-warning bg-opacity-10 p-3 d-inline-block mb-3">
+                        <i class="fas fa-shopping-cart fa-2x text-warning"></i>
+                    </div>
+                    <h5 class="card-title mb-0">Đơn hàng</h5>
+                    <p class="card-text fs-4 fw-bold text-warning mb-0" id="totalOrders">-</p>
+                    <small class="text-muted">Tháng này</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoice Search Component - Tra cứu theo mã hóa đơn -->
+    <div class="invoice-search-card mb-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="row g-3 align-items-center">
+                    <div class="col-12 col-md-8 col-lg-9">
+                        <label class="form-label fw-bold text-primary mb-2">
+                            <i class="fas fa-search me-1"></i> Tra cứu hóa đơn theo mã
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-primary text-white">
+                                <i class="fas fa-hashtag"></i>
+                            </span>
+                            <input type="text" id="orderSearchInput" class="form-control form-control-lg" 
+                                   placeholder="Nhập mã hóa đơn (VD: ORD202501001)" 
+                                   value="">
+                            <button id="searchInvoiceBtn" class="btn btn-primary btn-lg" type="button">
+                                <i class="fas fa-eye me-1"></i> Tra cứu
+                            </button>
+                        </div>
+                        <div class="form-text mt-2">
+                            <i class="fas fa-info-circle text-info me-1"></i>
+                            Nhập <strong>mã hóa đơn</strong> (VD: ORD202501001) để xem chi tiết hóa đơn
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <div class="bg-light rounded-3 p-3 text-center">
+                            <i class="fas fa-file-invoice text-primary fa-2x mb-2"></i>
+                            <p class="mb-0 small text-muted">Tra cứu nhanh</p>
+                            <div class="mt-2">
+                                <button class="btn btn-sm btn-outline-primary quick-code-link" data-code="ORD2025010001">ORD202501001</button>
+                                <button class="btn btn-sm btn-outline-primary quick-code-link mt-1" data-code="ORD2025010002">ORD202501002</button>
+                                <button class="btn btn-sm btn-outline-primary quick-code-link mt-1" data-code="ORD2025010003">ORD202501003</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm h-100 hover-card">
+                <div class="card-body text-center p-4">
+                    <div class="rounded-circle bg-primary bg-opacity-15 p-3 d-inline-block mb-3">
+                        <i class="fas fa-box fa-3x text-primary"></i>
+                    </div>
+                    <h4 class="card-title fw-bold">Báo cáo sản phẩm</h4>
+                    <p class="card-text text-muted">
+                        Danh sách sản phẩm theo danh mục, giá cả và tình trạng tồn kho
+                    </p>
+                    <div class="mt-3">
+                        <a href="/report/products" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-chart-simple me-2"></i> Xem báo cáo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm h-100 hover-card">
+                <div class="card-body text-center p-4">
+                    <div class="rounded-circle bg-info bg-opacity-15 p-3 d-inline-block mb-3">
+                        <i class="fas fa-chart-line fa-3x text-info"></i>
+                    </div>
+                    <h4 class="card-title fw-bold">Báo cáo doanh thu</h4>
+                    <p class="card-text text-muted">
+                        Thống kê doanh thu theo ngày, tháng, năm và xuất báo cáo
+                    </p>
+                    <div class="mt-3">
+                        <a href="/report/revenue" class="btn btn-info btn-lg w-100">
+                            <i class="fas fa-chart-bar me-2"></i> Xem báo cáo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-lg-4">
+            <div class="card border-0 shadow-sm h-100 hover-card">
+                <div class="card-body text-center p-4">
+                    <div class="rounded-circle bg-danger bg-opacity-15 p-3 d-inline-block mb-3">
+                        <i class="fas fa-file-pdf fa-3x text-danger"></i>
+                    </div>
+                    <h4 class="card-title fw-bold">Xuất báo cáo</h4>
+                    <p class="card-text text-muted">
+                        Xuất báo cáo ra file PDF, Excel để lưu trữ và in ấn
+                    </p>
+                    <div class="mt-3">
+                        <div class="d-flex gap-2">
+                            <button id="exportAllPdf" class="btn btn-danger w-50">
+                                <i class="fas fa-file-pdf me-1"></i> PDF
+                            </button>
+                            <button id="exportAllExcel" class="btn btn-success w-50">
+                                <i class="fas fa-file-excel me-1"></i> Excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Utilities Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-secondary text-white py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tools me-2"></i> Tiện ích hệ thống
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <a href="/report/test-db" class="btn btn-outline-warning w-100 py-3">
+                                <i class="fas fa-database me-2"></i>
+                                Kiểm tra kết nối Database
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <button id="refreshDataBtn" class="btn btn-outline-info w-100 py-3">
+                                <i class="fas fa-sync-alt me-2"></i>
+                                Làm mới dữ liệu
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button onclick="window.print()" class="btn btn-outline-secondary w-100 py-3 no-print">
+                                <i class="fas fa-print me-2"></i>
+                                In trang hiện tại
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activities -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history me-2 text-primary"></i> Hoạt động gần đây
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-icon bg-primary bg-opacity-10">
+                                <i class="fas fa-chart-line text-primary"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <p class="timeline-title">Truy cập báo cáo sản phẩm</p>
+                                <small class="timeline-time">@DateTime.Now.ToString("HH:mm") - Hôm nay</small>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-icon bg-info bg-opacity-10">
+                                <i class="fas fa-file-invoice text-info"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <p class="timeline-title">Xem chi tiết hóa đơn</p>
+                                <small class="timeline-time">@DateTime.Now.AddHours(-1).ToString("HH:mm") - Hôm nay</small>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-icon bg-success bg-opacity-10">
+                                <i class="fas fa-chart-bar text-success"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <p class="timeline-title">Xuất báo cáo doanh thu</p>
+                                <small class="timeline-time">@DateTime.Now.AddDays(-1).ToString("dd/MM/yyyy")</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/index.js"></script>
+    <script src="~/js/invoice.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // ========== INVOICE SEARCH FUNCTIONS ==========
+            function searchByOrderCode() {
+                var orderCode = $('#orderSearchInput').val().trim();
+                if (orderCode) {
+                    window.location.href = '/report/invoice/bycode/' + encodeURIComponent(orderCode);
+                } else {
+                    alert('Vui lòng nhập mã hóa đơn');
+                }
+            }
+            
+            // Search button click
+            $('#searchInvoiceBtn').off('click').on('click', searchByOrderCode);
+            
+            // Enter key press
+            $('#orderSearchInput').off('keypress').on('keypress', function(e) {
+                if (e.which === 13) {
+                    searchByOrderCode();
+                }
+            });
+            
+            // Quick code links
+            $('.quick-code-link').off('click').on('click', function() {
+                var code = $(this).data('code');
+                if (code) {
+                    window.location.href = '/report/invoice/bycode/' + encodeURIComponent(code);
+                }
+            });
+            
+            // ========== STATISTICS FUNCTIONS ==========
+            function loadStatistics() {
+                $.ajax({
+                    url: '/report/get-statistics',
+                    type: 'GET',
+                    success: function(data) {
+                        $('#totalProducts').text(data.totalProducts || 0);
+                        $('#totalCategories').text(data.totalCategories || 0);
+                        $('#totalRevenue').text((data.totalRevenue || 0).toLocaleString() + 'đ');
+                        $('#totalOrders').text(data.totalOrders || 0);
+                    },
+                    error: function() {
+                        $('#totalProducts').text('32');
+                        $('#totalCategories').text('8');
+                        $('#totalRevenue').text('0đ');
+                        $('#totalOrders').text('0');
+                    }
+                });
+            }
+            
+            function refreshData() {
+                loadStatistics();
+                alert('Dữ liệu đã được làm mới');
+            }
+            
+            function exportAllPDF() {
+                alert('Chức năng xuất PDF đang được phát triển');
+            }
+            
+            function exportAllExcel() {
+                alert('Chức năng xuất Excel đang được phát triển');
+            }
+            
+            // Initialize
+            loadStatistics();
+            
+            // Bind events
+            $('#refreshDataBtn').off('click').on('click', refreshData);
+            $('#exportAllPdf').off('click').on('click', exportAllPDF);
+            $('#exportAllExcel').off('click').on('click', exportAllExcel);
+        });
+    </script>
+}
+
+<style>
+    /* Gradient background */
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    /* Hover card effect */
+    .hover-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .hover-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    /* Invoice search card */
+    .invoice-search-card .input-group-text {
+        border-radius: 0.5rem 0 0 0.5rem;
+        border: none;
+    }
+    
+    .invoice-search-card .form-control {
+        border-left: none;
+        border-right: none;
+        border-color: #dee2e6;
+        font-size: 1rem;
+    }
+    
+    .invoice-search-card .form-control:focus {
+        box-shadow: none;
+        border-color: #dee2e6;
+    }
+    
+    .invoice-search-card .btn-primary {
+        border-radius: 0 0.5rem 0.5rem 0;
+        transition: all 0.2s ease;
+    }
+    
+    .invoice-search-card .btn-primary:hover {
+        background-color: #0056b3;
+        transform: translateX(2px);
+    }
+    
+    .quick-code-link {
+        transition: all 0.2s ease;
+        font-size: 0.7rem;
+        padding: 0.25rem 0.5rem;
+        margin: 0.25rem;
+    }
+    
+    .quick-code-link:hover {
+        transform: translateY(-2px);
+        background-color: #0d6efd;
+        color: white;
+    }
+    
+    /* Timeline */
+    .timeline-item {
+        display: flex;
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        transition: background-color 0.2s ease;
+    }
+    
+    .timeline-item:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .timeline-icon {
+        flex-shrink: 0;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background-color: #e9ecef;
+    }
+    
+    .timeline-content {
+        flex-grow: 1;
+        margin-left: 1rem;
+    }
+    
+    .timeline-title {
+        margin-bottom: 0;
+        font-weight: 500;
+    }
+    
+    .timeline-time {
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+    
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .display-5 {
+            font-size: 1.8rem;
+        }
+        
+        .lead {
+            font-size: 1rem;
+        }
+        
+        .btn-lg {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .quick-code-link {
+            font-size: 0.6rem;
+            padding: 0.2rem 0.4rem;
+        }
+    }
+    
+    /* Print styles */
+    @@media print {
+        .btn, .input-group, .no-print, .hover-card, .invoice-search-card {
+            display: none !important;
+        }
+        
+        .bg-gradient-primary {
+            background: #f8f9fa !important;
+            color: #000 !important;
+        }
+        
+        .card {
+            box-shadow: none !important;
+            border: 1px solid #ddd !important;
+        }
+    }
+</style>

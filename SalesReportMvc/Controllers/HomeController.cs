@@ -8,7 +8,8 @@ namespace SalesReportMvc.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            // Chuyển hướng thẳng đến Report/Index
+            return RedirectToAction("Index", "Report");
         }
 
         public IActionResult Privacy()

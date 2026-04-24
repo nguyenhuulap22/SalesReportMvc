@@ -1,0 +1,161 @@
+@model string
+
+<div class="invoice-search-card mb-4">
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="row g-3 align-items-center">
+                <div class="col-12 col-md-8 col-lg-9">
+                    <label class="form-label fw-bold text-primary mb-2">
+                        <i class="fas fa-search me-1"></i> Tra cứu hóa đơn theo mã
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-primary text-white">
+                            <i class="fas fa-hashtag"></i>
+                        </span>
+                        <input type="text" id="orderSearchInput" class="form-control form-control-lg" 
+                               placeholder="Nhập mã hóa đơn (VD: ORD202501001)" 
+                               value="@Model">
+                        <button id="searchInvoiceBtn" class="btn btn-primary btn-lg" type="button">
+                            <i class="fas fa-eye me-1"></i> Tra cứu
+                        </button>
+                    </div>
+                    <div class="form-text mt-2">
+                        <i class="fas fa-info-circle text-info me-1"></i>
+                        Nhập <strong>mã hóa đơn</strong> (VD: ORD202501001) để xem chi tiết
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-lg-3">
+                    <div class="bg-light rounded-3 p-3 text-center">
+                        <i class="fas fa-file-invoice text-primary fa-2x mb-2"></i>
+                        <p class="mb-0 small text-muted">Tra cứu nhanh</p>
+                        <div class="mt-2">
+                            <button class="btn btn-sm btn-outline-primary quick-code-link" data-code="ORD202501001">ORD202501001</button>
+                            <button class="btn btn-sm btn-outline-primary quick-code-link mt-1" data-code="ORD202501002">ORD202501002</button>
+                            <button class="btn btn-sm btn-outline-primary quick-code-link mt-1" data-code="ORD202501003">ORD202501003</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Function for quick code links
+    function searchByCode(orderCode) {
+        if (orderCode) {
+            window.location.href = '/report/invoice/bycode/' + encodeURIComponent(orderCode);
+        }
+    }
+    
+    // Main search function
+    function searchInvoice() {
+        var searchValue = document.getElementById('orderSearchInput').value.trim();
+        if (!searchValue) {
+            alert('Vui lòng nhập mã hóa đơn');
+            return;
+        }
+        
+        // Nếu là số -> tìm theo ID, nếu là chữ -> tìm theo OrderCode
+        if (/^\d+$/.test(searchValue)) {
+            window.location.href = '/report/invoice/' + searchValue;
+        } else {
+            window.location.href = '/report/invoice/bycode/' + encodeURIComponent(searchValue);
+        }
+    }
+    
+    // Bind events when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Search button
+        var searchBtn = document.getElementById('searchInvoiceBtn');
+        if (searchBtn) {
+            searchBtn.addEventListener('click', searchInvoice);
+        }
+        
+        // Enter key on input
+        var searchInput = document.getElementById('orderSearchInput');
+        if (searchInput) {
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchInvoice();
+                }
+            });
+        }
+        
+        // Quick code links
+        var quickLinks = document.querySelectorAll('.quick-code-link');
+        quickLinks.forEach(function(link) {
+            link.addEventListener('click', function() {
+                var code = this.getAttribute('data-code');
+                if (code) {
+                    window.location.href = '/report/invoice/bycode/' + encodeURIComponent(code);
+                }
+            });
+        });
+    });
+</script>
+
+<style>
+    .invoice-search-card .input-group-text {
+        border-radius: 0.5rem 0 0 0.5rem;
+        border: none;
+    }
+    
+    .invoice-search-card .form-control {
+        border-left: none;
+        border-right: none;
+        border-color: #dee2e6;
+        font-size: 1rem;
+    }
+    
+    .invoice-search-card .form-control:focus {
+        box-shadow: none;
+        border-color: #dee2e6;
+    }
+    
+    .invoice-search-card .btn-primary {
+        border-radius: 0 0.5rem 0.5rem 0;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    
+    .invoice-search-card .btn-primary:hover {
+        background-color: #0056b3;
+        transform: translateX(2px);
+    }
+    
+    .quick-code-link {
+        transition: all 0.2s ease;
+        font-size: 0.7rem;
+        padding: 0.25rem 0.5rem;
+        margin: 0.25rem;
+        cursor: pointer;
+    }
+    
+    .quick-code-link:hover {
+        transform: translateY(-2px);
+        background-color: #0d6efd;
+        color: white;
+    }
+    
+    @@media (max-width: 768px) {
+        .invoice-search-card .btn-lg {
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+        }
+        
+        .invoice-search-card .form-control-lg {
+            font-size: 0.9rem;
+            padding: 0.5rem 0.75rem;
+        }
+        
+        .invoice-search-card .bg-light {
+            margin-top: 1rem;
+        }
+        
+        .quick-code-link {
+            font-size: 0.6rem;
+            padding: 0.2rem 0.4rem;
+        }
+    }
+</style>
