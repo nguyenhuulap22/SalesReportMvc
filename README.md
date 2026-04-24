@@ -20,21 +20,22 @@ Hệ thống báo cáo doanh thu, sản phẩm và hóa đơn xây dựng trên 
 - [Git](https://git-scm.com/)
 
 ## Tạo Database
-# Cài EF Core tools (nếu chưa có)
+###  Cài EF Core tools (nếu chưa có)
 dotnet tool install --global dotnet-ef
 
-# Tạo migration
+###  Tạo migration
 dotnet ef migrations add InitialCreate
 
-# Cập nhật database
+###  Cập nhật database
 dotnet ef database update
 
-# Restore packages
+###  Restore packages
 dotnet restore
 
 # Build project
 dotnet build
 
-# Run project
+###  Run project
 dotnet run
 
+### insert dữ liệu từ file DataInsert.sql
