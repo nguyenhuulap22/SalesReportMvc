@@ -1,5 +1,4 @@
-﻿using SalesReportMvc.Models.ReportDtos;
-
+﻿using ReportClass;
 namespace SalesReportMvc.Services
 {
     public interface IReportService

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SalesReportMvc.Data;
-using SalesReportMvc.Models.ReportDtos;
+using ReportClass;
 
 namespace SalesReportMvc.Services
 {
