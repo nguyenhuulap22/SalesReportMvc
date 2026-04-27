@@ -1,4 +1,4 @@
-﻿namespace ReportClass
+﻿namespace SalesReport.Reporting
 {
     public class ProductReportDto
     {

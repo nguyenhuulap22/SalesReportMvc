@@ -1,4 +1,4 @@
-﻿using ReportClass;
+﻿using SalesReport.Reporting;
 namespace SalesReportMvc.Services
 {
     public interface IReportService

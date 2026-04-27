@@ -606,7 +606,7 @@
   </Page>
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
-    <DataSource Name="ReportClass">
+    <DataSource Name="SalesReport.Reporting">
       <ConnectionProperties>
         <DataProvider>System.Data.DataSet</DataProvider>
         <ConnectString>/* Local Connection */</ConnectString>
@@ -617,7 +617,7 @@
   <DataSets>
     <DataSet Name="Invoice">
       <Query>
-        <DataSourceName>ReportClass</DataSourceName>
+        <DataSourceName>SalesReport.Reporting</DataSourceName>
         <CommandText>/* Local Query */</CommandText>
       </Query>
       <Fields>
@@ -663,9 +663,9 @@
         </Field>
       </Fields>
       <rd:DataSetInfo>
-        <rd:DataSetName>ReportClass</rd:DataSetName>
+        <rd:DataSetName>SalesReport.Reporting</rd:DataSetName>
         <rd:TableName>InvoiceReportDto</rd:TableName>
-        <rd:ObjectDataSourceType>ReportClass.InvoiceReportDto, ReportClass, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</rd:ObjectDataSourceType>
+        <rd:ObjectDataSourceType>SalesReport.Reporting.InvoiceReportDto, SalesReport.Reporting, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</rd:ObjectDataSourceType>
       </rd:DataSetInfo>
     </DataSet>
   </DataSets>

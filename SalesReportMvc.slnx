@@ -1,4 +1,4 @@
 <Solution>
-  <Project Path="ReportClass/ReportClass.csproj" Id="240968af-2cd1-4db3-a85b-ba044a88f5ed" />
+  <Project Path="ReportClass/SalesReport.Reporting.csproj" Id="240968af-2cd1-4db3-a85b-ba044a88f5ed" />
   <Project Path="SalesReportMvc/SalesReportMvc.csproj" />
 </Solution>

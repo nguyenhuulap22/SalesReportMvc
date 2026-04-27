@@ -47,7 +47,7 @@
     <Compile Include="ReportDtos\RevenueReportDto.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="ReportInvoice.rdlc" />
+    <EmbeddedResource Include="Reports\ReportInvoice.rdlc" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\DataSources\InvoiceReportDto.datasource" />
