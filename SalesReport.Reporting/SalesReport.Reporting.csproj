@@ -7,8 +7,8 @@
     <ProjectGuid>{240968AF-2CD1-4DB3-A85B-BA044A88F5ED}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ReportClass</RootNamespace>
-    <AssemblyName>ReportClass</AssemblyName>
+    <RootNamespace>SalesReport.Reporting</RootNamespace>
+    <AssemblyName>SalesReport.Reporting</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -48,10 +48,12 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Reports\ReportInvoice.rdlc" />
+    <EmbeddedResource Include="Reports\ReportProduct.rdlc" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\DataSources\InvoiceReportDto.datasource" />
     <None Include="Properties\DataSources\ProductReportDto.datasource" />
+    <None Include="Properties\DataSources\ProductReportDto1.datasource" />
     <None Include="Properties\DataSources\RevenueReportDto.datasource" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

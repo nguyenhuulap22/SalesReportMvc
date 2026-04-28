@@ -2,10 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using SalesReportMvc.Data;
 using SalesReportMvc.Services;
-using SalesReportMvc.Models.ReportDtos;
 using SalesReportMvc.Models;
 using System.Text;
-
+using SalesReport.Reporting;
 namespace SalesReportMvc.Controllers
 {
     [Route("report")]
