@@ -1,0 +1,133 @@
+/* Index Page Styles */
+
+/* Gradient background */
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Hover card effect */
+.hover-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+    .hover-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.1) !important;
+    }
+
+/* Rounded circle backgrounds */
+.bg-opacity-15 {
+    background-color: rgba(0, 0, 0, 0.15);
+}
+
+/* Timeline styles */
+.timeline {
+    position: relative;
+}
+
+.timeline-item {
+    display: flex;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s ease;
+}
+
+    .timeline-item:hover {
+        background-color: #f8f9fa;
+    }
+
+.timeline-icon {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #e9ecef;
+}
+
+.timeline-content {
+    flex-grow: 1;
+    margin-left: 1rem;
+}
+
+.timeline-title {
+    margin-bottom: 0;
+    font-weight: 500;
+}
+
+.timeline-time {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+/* Stat cards */
+.stat-card {
+    transition: transform 0.2s ease;
+}
+
+    .stat-card:hover {
+        transform: translateY(-3px);
+    }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .display-5 {
+        font-size: 1.8rem;
+    }
+
+    .lead {
+        font-size: 1rem;
+    }
+
+    .btn-lg {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    h4 {
+        font-size: 1.2rem;
+    }
+
+    .stat-card .fs-4 {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .display-5 {
+        font-size: 1.4rem;
+    }
+
+    .hero-section {
+        padding: 1rem !important;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+}
+
+/* Print styles */
+@media print {
+    .btn, .input-group, #orderIdInput, .hover-card, .no-print {
+        display: none !important;
+    }
+
+    .bg-gradient-primary {
+        background: #f8f9fa !important;
+        color: #000 !important;
+    }
+
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+    }
+
+    .stat-card {
+        border: 1px solid #ddd;
+    }
+}

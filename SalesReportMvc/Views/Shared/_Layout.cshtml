@@ -1,50 +1,143 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - SalesReportMvc</title>
-    <script type="importmap"></script>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="~/css/revenue.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/index.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/invoice.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/SalesReportMvc.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SalesReportMvc</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
+    <!-- Simple Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" asp-area="" asp-controller="Report" asp-action="Index">
+                <i class="fas fa-chart-line me-2"></i>
+                SalesReport System
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Report" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")" 
+                           asp-area="" asp-controller="Report" asp-action="Index">
+                            <i class="fas fa-home me-1"></i> Trang chủ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Products" ? "active" : "")" 
+                           asp-area="" asp-controller="Report" asp-action="Products">
+                            <i class="fas fa-box me-1"></i> Sản phẩm
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Revenue" ? "active" : "")" 
+                           asp-area="" asp-controller="Report" asp-action="Revenue">
+                            <i class="fas fa-chart-line me-1"></i> Doanh thu
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showInvoiceDialog(); return false;">
+                            <i class="fas fa-file-invoice me-1"></i> Tra hóa đơn
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "TestDb" ? "active" : "")" 
+                           asp-area="" asp-controller="Report" asp-action="TestDb">
+                            <i class="fas fa-database me-1"></i> Kiểm tra DB
+                        </a>
+                    </li>
+                </ul>
             </div>
-        </nav>
-    </header>
-    <div class="container">
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid px-2 px-md-4 mt-4">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <!-- Simple Footer -->
+    <footer class="bg-light text-center text-muted py-3 mt-4 border-top">
         <div class="container">
-            &copy; 2026 - SalesReportMvc - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <span>&copy; 2026 - SalesReportMvc - Hệ thống báo cáo doanh thu</span>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+    <!-- Modal Tra cứu hóa đơn -->
+    <div class="modal fade" id="invoiceModal" tabindex="-1" aria-labelledby="invoiceModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="invoiceModalLabel">
+                        <i class="fas fa-file-invoice me-2"></i> Tra cứu hóa đơn
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nhập mã đơn hàng:</label>
+                        <input type="number" id="orderIdInput" class="form-control form-control-lg" placeholder="VD: 1, 2, 3..." value="1">
+                        <div class="form-text">Nhập số thứ tự đơn hàng cần xem chi tiết.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Đóng
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="viewInvoice()">
+                        <i class="fas fa-eye me-1"></i> Xem hóa đơn
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom Scripts -->
+    <script src="~/js/datatable-helper.js"></script>
+    <script src="~/js/invoice.js"></script>
+    <script src="~/js/revenue.js" asp-append-version="true"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    
+    <script>
+        function showInvoiceDialog() {
+            $('#invoiceModal').modal('show');
+        }
+        
+        function viewInvoice() {
+            var orderId = $('#orderIdInput').val();
+            if (orderId && orderId > 0) {
+                window.location.href = '/report/invoice/' + orderId;
+            } else {
+                alert('Vui lòng nhập mã đơn hàng hợp lệ');
+            }
+        }
+        
+        // Bootstrap tooltip initialization
+        $(document).ready(function() {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+    </script>
+    
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -3,7 +3,7 @@ using SalesReportMvc.Data;
 using SalesReportMvc.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddScoped<IPdfExportService, MockPdfExportService>();
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -24,7 +24,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 app.UseAuthorization();
-
+app.UseStatusCodePagesWithReExecute("/error/{0}");
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
